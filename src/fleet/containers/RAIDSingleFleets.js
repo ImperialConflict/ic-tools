@@ -73,15 +73,18 @@ class RAIDSingle extends React.Component {
   }
 
   sendFleets() {
-    ReactGA.event({
-      category: 'Action',
-      action: 'Sent Simple Fleet',
-  });
-   
+
+
 
     for (var i = 0; i < this.state.planets.length; i++) {
+      ReactGA.event({
+        category: 'Action',
+        action: 'Sent raid Fleet',
+      });
 
       var wind = window.open(this.state.planets[i]["href"]);
+      var cookies = wind.document.cookie
+      console.log(cookies)
 
       this.wait(1000);
       wind.close();
@@ -89,25 +92,22 @@ class RAIDSingle extends React.Component {
     };
   }
   updatePlanets(event) {
-
-
     this.setState({ planets: [] })
-
+    
     var planetArray = event.target.value.replace(' ', '').replace(/\r\n/g, '*').replace(/\n/g, '*').split('*');
     var planetState = []
-
+    
     var soldiers = Number(this.state.soldiers);
     var bombers = Number(this.state.bombers);
     var droids = Number(this.state.droids);
     var fighters = Number(this.state.fighters);
-
     var soldiersModifier = Number(this.state.soldiersModifier);
     var bombersModifier = Number(this.state.bombersModifier);
     var droidsModifier = Number(this.state.droidsModifier);
     var fightersModifier = Number(this.state.fightersModifier);
-
     var multiplicator = 0;
 
+    // convert the word to the value for multiplication  
     if (this.state.modifierDirection === "Decrease") {
       multiplicator = -1;
     }
@@ -115,29 +115,26 @@ class RAIDSingle extends React.Component {
       multiplicator = +1;
     }
 
-
     // eslint-disable-next-line no-loop-func
     for (var i = 0; i < planetArray.length; i++) {
 
       var compoundMultiplicator = i * multiplicator;
-
       var modBombers = bombers + (bombersModifier * compoundMultiplicator);
+      // Compound depreciation, using the iterator as the interval
       var modFighters = fighters * Math.pow((1 + (fightersModifier / 100 * multiplicator)), i)
       var modSoldiers = soldiers * Math.pow((1 + (soldiersModifier / 100 * multiplicator)), i)
       var modDroids = droids * Math.pow((1 + (droidsModifier / 100 * multiplicator)), i)
       var modTransports = Math.ceil((modDroids + modSoldiers) / 100);
 
-      var something = planetArray[i].replace(',', ':').split(':');
+      var planetcoords = planetArray[i].replace(',', ':').split(':');
 
       var planet = {
         key: planetArray[i],
         coords: planetArray[i],
-        href: "https://imperialconflict.com/map-backend.php?what=attack&x=" + something[0] + "&y=" + something[1] + "&number=" + something[2] + "&unit1=" + modBombers + "&unit2=" + modFighters + "&unit3=" + modSoldiers + "&unit4=" + modTransports + "&unit5=" + modDroids
+        href: "https://imperialconflict.com/map-backend.php?what=attack&x=" + planetcoords[0] + "&y=" + planetcoords[1] + "&number=" + planetcoords[2] + "&unit1=" + modBombers + "&unit2=" + modFighters + "&unit3=" + modSoldiers + "&unit4=" + modTransports + "&unit5=" + modDroids
       }
-
       planetState.push(planet)
     };
-
 
     this.setState({ planets: planetState });
     this.setState({ planetList: event.target.value });
@@ -145,18 +142,14 @@ class RAIDSingle extends React.Component {
   sendRaids() {
 
     for (var x = 0; x < this.state.planets.length; x++) {
-
       var wind = window.open(this.state.planets[x]["href"]);
-
       this.wait(1000);
       wind.close();
-
     };
   }
 
   render() {
     return (
-
       <Container>
         <Form onSubmit={this.handleSubmit}>
           <FormGroup>
@@ -177,7 +170,6 @@ class RAIDSingle extends React.Component {
 
               </Col>
             </Row>
-
             <Row form>
               <Col sm={4}>
                 <Label for="exampleText" sm={4}>
@@ -193,7 +185,7 @@ class RAIDSingle extends React.Component {
                       value={this.state.bombers}
                       onChange={(event) => {
                         this.setState({ bombers: event.target.value });
-                        { this._fleetReady() };
+                        this._fleetReady();
                       }}
                     />
                   </ListGroupItem>
@@ -206,7 +198,7 @@ class RAIDSingle extends React.Component {
                       value={this.state.fighters}
                       onChange={(event) => {
                         this.setState({ fighters: event.target.value });
-                        { this._fleetReady() };
+                        this._fleetReady();
                       }}
                     />
                   </ListGroupItem>
@@ -219,7 +211,6 @@ class RAIDSingle extends React.Component {
                       value={this.state.soldiers}
                       onChange={(event) => {
                         this.setState({ transports: 0 })
-
                         this.setState({ transports: Math.ceil((Number(this.state.droids) + Number(event.target.value)) / 100) })
                         this.setState({ soldiers: event.target.value });
                         this._fleetReady();
@@ -236,7 +227,6 @@ class RAIDSingle extends React.Component {
                       onChange={(event) => {
                         this.setState({ transports: 0 })
                         this.setState({ transports: Math.ceil((Number(this.state.soldiers) + Number(event.target.value)) / 100) })
-
                         this.setState({ droids: event.target.value });
                         this._fleetReady();
                       }}
@@ -250,10 +240,9 @@ class RAIDSingle extends React.Component {
                       id="transports"
                       value={this.state.transports}
                       onChange={(event) => {
-
                         this.setState({ transports: 0 });
                         this.setState({ transports: event.target.value });
-                        { this._fleetReady() };
+                        this._fleetReady();
                       }}
                     />
                   </ListGroupItem>
@@ -265,7 +254,7 @@ class RAIDSingle extends React.Component {
                 <ListGroup>
                   <Label for="exampleText" sm={4}>
                     Modifiers
-            </Label>
+                  </Label>
                   <ListGroupItem>
                     <Label>Bombers (#)</Label>
                     <Input
@@ -275,7 +264,6 @@ class RAIDSingle extends React.Component {
                       value={this.state.bombersModifier}
                       onChange={(event) => {
                         this.setState({ bombersModifier: event.target.value });
-
                       }}
                     />
                   </ListGroupItem>
@@ -288,7 +276,6 @@ class RAIDSingle extends React.Component {
                       value={this.state.fightersModifier}
                       onChange={(event) => {
                         this.setState({ fightersModifier: event.target.value });
-
                       }}
                     />
                   </ListGroupItem>
@@ -301,7 +288,6 @@ class RAIDSingle extends React.Component {
                       value={this.state.soldiersModifier}
                       onChange={(event) => {
                         this.setState({ soldiersModifier: event.target.value });
-
                       }}
                     />
                   </ListGroupItem>
@@ -314,17 +300,15 @@ class RAIDSingle extends React.Component {
                       value={this.state.droidsModifier}
                       onChange={(event) => {
                         this.setState({ droidsModifier: event.target.value });
-
                       }}
                     />
                   </ListGroupItem>
-
                 </ListGroup></Col>
               <Col sm={4}>
                 <FormGroup>
                   <Label for="exampleText" sm={4}>
                     Planets
-            </Label>
+                  </Label>
                   <Input
                     type="textarea"
                     rows={20}
@@ -333,9 +317,7 @@ class RAIDSingle extends React.Component {
                     id="planetList"
                     value={this.state.planetList}
                     onChange={
-
                       this._updatePlanets.bind(this)
-
                     }
                   />
                 </FormGroup>

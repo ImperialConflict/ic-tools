@@ -19,7 +19,7 @@ class PopupAlert extends React.Component {
   render() {
     return (
       <Alert color="danger" isOpen={this.state.visible} toggle={this.onDismiss}>
-        To ensure this tool can work, please whitelist this site for pop ups!
+        To ensure this tool can work, please whitelist this site for pop ups!   
       </Alert>
     );
   }
